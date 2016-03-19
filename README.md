@@ -8,7 +8,7 @@ supported by Nerves. This project fills that gap.
 See the GitHub `Releases` tab to download the toolchain. The naming for
 toolchains is:
 
-    nerves-toolchain-<gcc tuple>-<host OS>-<host architecture>-<version>.tar.xz
+    nerves-toolchain-<gcc tuple>-<host OS>-<host architecture>-<version>
 
 The `gcc tuple` is a standard way of describing a target. The most important parts
 are the architecture (e.g., `arm`) and the C Library and ABI (e.g.,
@@ -50,7 +50,7 @@ brew install --universal gettext
 
 ```
 
-Run `build_release.sh` and wait.
+Run `mix compile.nerves_toolchain` and wait.
 
 ## Windows
 
@@ -97,10 +97,10 @@ may provide some help.
 
 You may need to update the `ctng` configurations if `gcc` needs to be upgraded
 or the C library needs to change. The small defconfigs are stored in the
-`configs` directory and expanded automatically by `build.sh` to
+`configs` directory and expanded automatically by `compile.nerves_toolchain` to
 `work-.../build/.config`. In that directory, you can run `make menuconfig` to
 change the `ctng` configuration. When you're done, run `make savedefconfig` and
-copy the result to the `configs` directory.
+copy the result to the `src/configs` directory.
 
 ## Toolchain configuration notes
 

@@ -21,7 +21,6 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
     {:ok, _} = Application.ensure_all_started(toolchain)
 
     toolchain_config = Application.get_all_env(toolchain)
-
     target_tuple = toolchain_config[:target_tuple] ||
       raise "Target tuple required to be set in toolchain env"
 
@@ -41,13 +40,11 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
       Mix.shell.info "Nerves toolchain up to date"
     end
 
-    Mix.shell.info "Update environment for toolchain"
-    System.put_env("NERVES_TOOLCHAIN", app_path)
   end
 
   defp stale?(app_path) do
     app_path = app_path
-    |> Path.join("toolchain")
+    |> Path.join("nerves_toolchain")
     if (File.dir?(app_path)) do
       src =  Path.join(File.cwd!, "src")
       sources = src
@@ -109,7 +106,7 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
     System.cmd("tar", ["xf", tar_file], cd: tar_dir)
     File.rm!(tar_file)
     toolchain_dir = Enum.find(File.ls!(tar_dir), &(String.contains?(&1, params.target_tuple)))
-    target = Path.join(tar_dir, "toolchain")
+    target = Path.join(tar_dir, "nerves_toolchain")
     rename = File.rename(Path.join(tar_dir, toolchain_dir), target)
     File.touch(target)
   end

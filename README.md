@@ -1,4 +1,4 @@
-# nerves-toolchain
+# nerves_toolchain
 
 This project contains the configuration and scripts used to build the
 cross-compilers for the Nerves project. While pre-built toolchains exist for

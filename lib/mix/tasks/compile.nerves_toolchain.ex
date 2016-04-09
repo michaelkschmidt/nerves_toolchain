@@ -10,6 +10,7 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
   @recursive true
   @switches [cache: :string]
   @recv_timeout 120_000
+  @dir "nerves/toolchain"
 
   def run(args) do
     Mix.shell.info "Compile Nerves toolchain"
@@ -29,10 +30,12 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
 
     cache       = opts[:cache] || nerves_toolchain_config[:cache] || :github
     cache       = if is_binary(cache), do: String.to_atom(cache), else: cache
-    app_path    = Mix.Project.app_path(config)
-    params      = %{target_tuple: target_tuple, version: config[:version], app_path: app_path}
+    build_path  = Mix.Project.build_path
+                  |> Path.join(@dir)
+    params      = %{target_tuple: target_tuple, version: config[:version], build_path: build_path}
 
-    if stale?(app_path) do
+    if stale?(build_path) do
+      File.rm_rf!(build_path)
       toolchain   = cache(cache, params)
       toolchain
       |> copy_build(params)
@@ -42,16 +45,15 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
 
   end
 
-  defp stale?(app_path) do
-    app_path = app_path
-    |> Path.join("nerves_toolchain")
-    if (File.dir?(app_path)) do
+  defp stale?(build_path) do
+    manifest = Path.join(build_path, ".nerves.lock")
+    if (File.exists?(manifest)) do
       src =  Path.join(File.cwd!, "src")
       sources = src
       |> File.ls!
       |> Enum.map(& Path.join(src, &1))
 
-      Mix.Utils.stale?(sources, [app_path])
+      Mix.Utils.stale?(sources, [manifest])
     else
       true
     end
@@ -100,15 +102,25 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
 
   defp copy_build(toolchain_tar, params) do
     Mix.shell.info "Unpacking toolchain to build dir"
-    tar_dir = params.app_path
-    tar_file = tar_dir <> "/toolchain.tar.xz"
-    write_result = File.write(tar_file, toolchain_tar)
-    System.cmd("tar", ["xf", tar_file], cd: tar_dir)
-    File.rm!(tar_file)
-    toolchain_dir = Enum.find(File.ls!(tar_dir), &(String.contains?(&1, params.target_tuple)))
-    target = Path.join(tar_dir, "nerves_toolchain")
-    rename = File.rename(Path.join(tar_dir, toolchain_dir), target)
-    File.touch(target)
+    dest = params.build_path
+    tmp_dir = Path.join(dest, ".tmp")
+    File.mkdir_p(dest)
+    File.mkdir_p(tmp_dir)
+
+    tar_file = tmp_dir <> "/toolchain.tar.xz"
+    File.write(tar_file, toolchain_tar)
+    System.cmd("tar", ["xf", tar_file], cd: tmp_dir)
+
+
+    source =
+      File.ls!(tmp_dir)
+      |> Enum.map(& Path.join(tmp_dir, &1))
+      |> Enum.find(&File.dir?/1)
+      
+    File.cp_r(source, dest)
+    File.rm_rf!(tmp_dir)
+    Path.join(dest, ".nerves.lock")
+    |> File.touch
   end
 
 end

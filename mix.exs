@@ -26,6 +26,7 @@ defmodule NervesToolchain.Mixfile do
 
   defp package do
     [maintainers: ["Frank Hunleth", "Justin Schneck"],
+     files: ["lib", "src", "README.md", "LICENSE", "nerves.exs"],
      licenses: ["Apache 2.0"],
      links: %{"Github" => "https://github.com/nerves-project/nerves_toolchain"}]
   end

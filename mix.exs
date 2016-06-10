@@ -15,7 +15,7 @@ defmodule NervesToolchain.Mixfile do
   end
 
   defp deps do
-    [{:httpoison, "~> 0.8"}]
+    []
   end
 
   defp description do

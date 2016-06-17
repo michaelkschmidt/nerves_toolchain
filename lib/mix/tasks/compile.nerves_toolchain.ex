@@ -61,11 +61,10 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
 
   defp cache(:github, params) do
     Mix.shell.info "Downloading from Github Cache"
-    Application.ensure_all_started(:httpoison)
 
     url = "https://github.com/nerves-project/nerves-toolchain/releases/download/v#{params.version}/nerves-#{params.target_tuple}-#{host_platform}-#{host_arch}-v#{params.version}.tar.xz"
-    case HTTPoison.get(url, [], follow_redirect: true, recv_timeout: @recv_timeout) do
-      {:ok, %{status_code: code, body: body}} when code in 200..299 -> body
+    case Mix.Utils.read_path(url) do
+      {:ok, body} -> body
       {_, error} ->
         raise "Nerves Toolchain Github cache returned error: #{inspect error}"
     end

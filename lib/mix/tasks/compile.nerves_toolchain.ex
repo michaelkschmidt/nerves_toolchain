@@ -13,8 +13,7 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
   @dir "nerves/toolchain"
 
   def run(args) do
-    Mix.shell.info "Compile Nerves toolchain"
-
+    Mix.shell.info "[nerves_toolchain][compile]"
     {opts, _, _} = OptionParser.parse(args, switches: @switches)
     config = Mix.Project.config
     toolchain = config[:app]
@@ -40,7 +39,7 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
       toolchain
       |> copy_build(params)
     else
-      Mix.shell.info "Nerves toolchain up to date"
+      shell_info "Toolchain up to date"
     end
 
   end
@@ -60,11 +59,13 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
   end
 
   defp cache(:github, params) do
-    Mix.shell.info "Downloading from Github Cache"
+    shell_info "Downloading Toolchain"
 
     url = "https://github.com/nerves-project/nerves-toolchain/releases/download/v#{params.version}/nerves-#{params.target_tuple}-#{host_platform}-#{host_arch}-v#{params.version}.tar.xz"
     case Mix.Utils.read_path(url) do
-      {:ok, body} -> body
+      {:ok, body} ->
+        shell_info "Toolchain Downloaded"
+        body
       {_, error} ->
         raise "Nerves Toolchain Github cache returned error: #{inspect error}"
     end
@@ -100,7 +101,7 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
   end
 
   defp copy_build(toolchain_tar, params) do
-    Mix.shell.info "Unpacking toolchain to build dir"
+    shell_info "Unpacking Toolchain"
     dest = params.build_path
     tmp_dir = Path.join(dest, ".tmp")
     File.mkdir_p(dest)
@@ -115,11 +116,13 @@ defmodule Mix.Tasks.Compile.NervesToolchain do
       File.ls!(tmp_dir)
       |> Enum.map(& Path.join(tmp_dir, &1))
       |> Enum.find(&File.dir?/1)
-      
+
     File.cp_r(source, dest)
     File.rm_rf!(tmp_dir)
     Path.join(dest, ".nerves.lock")
     |> File.touch
   end
+
+  def shell_info(text), do: Mix.shell.info "[nerves_toolchain][http] #{text}"
 
 end

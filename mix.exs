@@ -3,7 +3,7 @@ defmodule NervesToolchain.Mixfile do
 
   def project do
     [app: :nerves_toolchain,
-     version: "0.6.2",
+     version: "0.6.3",
      elixir: "~> 1.2",
      description: description,
      package: package,

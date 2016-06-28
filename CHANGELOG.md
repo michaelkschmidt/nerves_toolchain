@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.6.3
+
+  * New features
+    * Updated shell output to mimic nerves_system
+    * Removed dependency on HTTPoison / hackney
+    * Support for downloading through proxies
+
+## v0.6.2
+
+  * New features
+    * Updated project to migrate toolchain configuration out to nerves_toolchain_* projects
+
 ## v0.6.1
 
   * New features
@@ -59,4 +71,3 @@ warnings when host/target Erlang and Elixir versions do not match.
 
   * New features
     * Raspberry Pi A+/B+ crosscompiler (armv6)
-
